@@ -14,6 +14,16 @@ export default function _layout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="dyno-shorts"
+        options={{
+          headerShown: false,
+          title: "dyno-shorts",
+          tabBarIcon: ({ color, size }) => (
+            <AntDesign name="videocamera" color={color} size={size} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
