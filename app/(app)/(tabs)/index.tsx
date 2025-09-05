@@ -37,16 +37,6 @@ const { signOut } = useAuth();
               Discover and collaborate on acme. Explore our services now.
             </Text>
 
-            <View className="gap-4">
-              <Link
-                suppressHighlighting
-                className="flex h-9 items-center justify-center overflow-hidden rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 web:shadow ios:shadow transition-colors hover:bg-gray-900/90 active:bg-gray-400/90 web:focus-visible:outline-none web:focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-                href="/"
-              >
-                Explore
-              </Link>
-            </View>
-
             <TouchableOpacity onPress={handleSignout}>
                 <Text>
                   Sign out
@@ -65,7 +55,7 @@ function Header() {
     <View style={{ paddingTop: top }}>
       <View className="px-4 lg:px-6 h-14 flex items-center flex-row justify-between ">
         <Link className="font-bold flex-1 items-center justify-center" href="/">
-          FIT_PAPA
+          DON't know
         </Link>
         <View className="flex flex-row gap-4 sm:gap-6">
           <Link
