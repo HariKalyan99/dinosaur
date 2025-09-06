@@ -6,7 +6,9 @@ import UploadDynoButton from "@/app/components/uploadDyno/upload-dyno-button";
 import { Colors } from "@/app/constants/colors";
 import { screenHeight } from "@/app/utils/scaling";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import * as MediaLibrary from "expo-media-library";
 import { useRouter } from "expo-router";
+import * as VideoThumbnails from "expo-video-thumbnails";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -20,7 +22,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { createThumbnail } from "react-native-create-thumbnail";
 import { FlatList } from "react-native-gesture-handler";
 
 interface VideoProp {
@@ -28,7 +29,8 @@ interface VideoProp {
   playableDuration: number;
 }
 
-const useGallery = ({ pageSize = 30 }) => { // this will refetch again and again on the count defined when scrolled up
+const useGallery = ({ pageSize = 30 }) => {
+  // this will refetch again and again on the count defined when scrolled up
   const [videos, setVideos] = useState<VideoProp[]>([]);
   const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
   const [permissionNotGranted, setPermissionGranted] = useState<boolean>(false);
@@ -142,9 +144,6 @@ export const convertDurationToMMSS = (seconds: number) => {
   return `${formattedMinutes}:${formattedSeconds}`;
 };
 
-
-
-
 const UploadDynos = () => {
   const {
     videos,
@@ -160,62 +159,66 @@ const UploadDynos = () => {
   };
 
   const handleVideoSelect = async (data: any) => {
-  const { uri } = data;
+    const { uri } = data;
+    const navigate = useRouter();
 
-  const navigate = useRouter();
+    try {
+      let videoUri = uri;
 
-  if (Platform.OS === "android") {
-    createThumbnail({
-      url: uri || "",
-      timeStamp: 100,
-    })
-      .then((response) => {
-        console.log(response);
+      // iOS: resolve ph:// uri to local file uri
+      if (Platform.OS === "ios" && uri.startsWith("ph://")) {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        if (status !== "granted") {
+          console.error("Media Library permissions not granted");
+          return;
+        }
 
-        navigate.push({
-          pathname: "/dyno-shorts",
-          params: {
-            thumb_uri: response.path,
-            file_uri: uri,
-          },
+        const assets = await MediaLibrary.getAssetsAsync({
+          mediaType: "video",
         });
-      })
-      .catch((err) => {
-        console.error("Thumbnail generation error", err);
+        const match = assets.assets.find((a) => a.uri === uri);
+        if (!match) {
+          console.error("Could not resolve iOS asset for", uri);
+          return;
+        }
+
+        const assetInfo = await MediaLibrary.getAssetInfoAsync(match.id);
+        videoUri = assetInfo.localUri ?? assetInfo.uri;
+      }
+
+      // Generate thumbnail
+      const thumbnail = await VideoThumbnails.getThumbnailAsync(videoUri, {
+        time: 1000, // 1 second
       });
-    return;
-  }
-  const fileData = await CameraRoll.iosGetImageDataById(uri);
-  createThumbnail({
-    url: fileData?.node?.image?.filepath || "",
-    timeStamp: 100,
-  })
-    .then((response) => {
-      console.log(response);
+
+      console.log("Thumbnail created:", thumbnail);
+
       navigate.push({
-        pathname: "/dyno-shorts",
+        pathname: "/upload-dyno-snap",
         params: {
-          thumb_uri: response.path,
-          file_uri: uri,
+          thumb_uri: thumbnail.uri,
+          file_uri: videoUri,
         },
       });
-    })
-    .catch((err) => {
-      console.error("Thumbnail generation error", err); // thumbnail generation error
-    });
-};
+    } catch (err) {
+      console.error("Error generating thumbnail or navigating:", err);
+    }
+  };
 
-const renderItem = ({ item }: { item: VideoProp }) => {
-  return (
-    <TouchableOpacity style={styles.videoItem} onPress={() => handleVideoSelect(item)}>
-      <Image source={{ uri: item.uri }} style={styles.thumbnail} />
-      <Text style={styles.time} className="font-semibold text-white">
-        {convertDurationToMMSS(item?.playableDuration)}
-        {/* time */}
-      </Text>
-    </TouchableOpacity>
-  );
-};
+  const renderItem = ({ item }: { item: VideoProp }) => {
+    return (
+      <TouchableOpacity
+        style={styles.videoItem}
+        onPress={() => handleVideoSelect(item)}
+      >
+        <Image source={{ uri: item.uri }} style={styles.thumbnail} />
+        <Text style={styles.time} className="font-semibold text-white">
+          {convertDurationToMMSS(item?.playableDuration)}
+          {/* time */}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderFooter = () => {
     if (!isLoading) return null;
@@ -224,7 +227,7 @@ const renderItem = ({ item }: { item: VideoProp }) => {
   return (
     <CustomView>
       <CustomSafeAreaView>
-        <CustomHeader title="Upload Dyno" />
+        <CustomHeader title="Select Dyno" />
 
         <UploadDynoButton />
         <RecentDynoButton />

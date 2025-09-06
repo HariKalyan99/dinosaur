@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.harikalyan.dinosaur"
+      "bundleIdentifier": "com.harikalyan.dinosaur",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app needs access to your media library to select and create video thumbnails."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,7 +38,9 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-video",
+      "react-native-video"
     ],
     "experiments": {
       "typedRoutes": true

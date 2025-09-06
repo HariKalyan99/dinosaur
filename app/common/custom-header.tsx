@@ -19,7 +19,7 @@ const CustomHeader: FC<CustomHeaderProps> = ({title, onInfoPress}) => {
         <AntDesign name='arrowleft' color={Colors.text} size={25}/>
       </TouchableOpacity>
         <Text className='text-xl text-white'>
-            Add Dyno
+            {title}
         </Text>
         <TouchableOpacity onPress={onInfoPress}>
             <AntDesign name='info' color={Colors.disabled} size={25}/>

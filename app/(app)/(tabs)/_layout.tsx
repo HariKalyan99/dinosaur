@@ -14,12 +14,12 @@ export default function _layout() {
           ),
         }}
       />
-       <Tabs.Screen
+      <Tabs.Screen
         name="upload-dynos"
         options={{
           headerShown: false,
           title: "upload",
-          tabBarStyle: {display: "none"},
+          tabBarStyle: { display: "none" },
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="pluscircle" size={size} color={color} />
           ),
@@ -35,12 +35,12 @@ export default function _layout() {
         options={{
           headerShown: false,
           title: "dyno-shorts",
+          tabBarStyle: { display: "none" },
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="videocamera" color={color} size={size} />
           ),
         }}
       />
-     
     </Tabs>
   );
 }
